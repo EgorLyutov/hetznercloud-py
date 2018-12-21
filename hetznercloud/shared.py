@@ -2,7 +2,10 @@ import json
 
 import requests
 
-from .exceptions import HetznerAuthenticationException, HetznerInternalServerErrorException, HetznerActionException, HetznerRateLimitExceeded
+from hetznercloud.exceptions import (
+    HetznerAuthenticationException, HetznerInternalServerErrorException,
+    HetznerActionException, HetznerRateLimitExceeded
+)
 
 
 def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
@@ -18,6 +21,8 @@ def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
         request = requests.delete(api, headers=headers)
     elif method == "PUT":
         request = requests.put(api, headers=headers, data=data)
+    else:
+        raise HetznerActionException()
 
     if request.status_code == 401 or request.status_code == 403:
         raise HetznerAuthenticationException()

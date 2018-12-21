@@ -1,3 +1,3 @@
-from .client import HetznerCloudClientConfiguration, HetznerCloudClient
-from .constants import *
-from .exceptions import *
+from hetznercloud.client import HetznerCloudClientConfiguration, HetznerCloudClient
+from hetznercloud.constants import *
+from hetznercloud.exceptions import *

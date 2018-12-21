@@ -1,11 +1,14 @@
 import time
 
-from .actions import HetznerCloudAction
-from .constants import RESCUE_TYPE_LINUX, RESCUE_TYPE_FREEBSD, BACKUP_WINDOW_2AM_6AM, SERVER_STATUS_RUNNING, \
-    SERVER_STATUS_OFF
-from .exceptions import HetznerServerNotFoundException, HetznerInvalidArgumentException, HetznerActionException, \
+from hetznercloud.actions import HetznerCloudAction
+from hetznercloud.constants import (
+    RESCUE_TYPE_LINUX, RESCUE_TYPE_FREEBSD, BACKUP_WINDOW_2AM_6AM, SERVER_STATUS_RUNNING, SERVER_STATUS_OFF
+)
+from hetznercloud.exceptions import (
+    HetznerServerNotFoundException, HetznerInvalidArgumentException, HetznerActionException,
     HetznerWaitAttemptsExceededException
-from .shared import _get_results
+)
+from hetznercloud.shared import _get_results
 
 
 def _get_server_json(config, server_id):
@@ -23,12 +26,12 @@ class HetznerCloudServersAction(object):
     def __init__(self, config):
         self._config = config
 
-    def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None, location=None):
+    def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None,
+               location=None):
         if not name or not server_type or not image:
-            raise HetznerInvalidArgumentException("name" if not name
-                                                  else "server_type" if not server_type
-            else "image" if not image
-            else "")
+            raise HetznerInvalidArgumentException(
+                "name" if not name else "server_type" if not server_type else "image" if not image else ""
+            )
 
         create_params = {
             "name": name,
@@ -65,7 +68,7 @@ class HetznerCloudServersAction(object):
         status_code, results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
         if status_code != 200:
             raise HetznerActionException(results)
-        
+
         for result in results["servers"]:
             yield HetznerCloudServer._load_from_json(self._config, result)
 
@@ -95,8 +98,10 @@ class HetznerCloudServer(object):
         if not iso:
             raise HetznerInvalidArgumentException("iso")
 
-        status_code, result = _get_results(self._config, "servers/%s/actions/attach_iso" % self.id, method="POST",
-                                           body={"iso": iso})
+        status_code, result = _get_results(
+            self._config, "servers/%s/actions/attach_iso" % self.id, method="POST",
+            body={"iso": iso}
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 
@@ -119,8 +124,10 @@ class HetznerCloudServer(object):
         if not ip:
             raise HetznerInvalidArgumentException("ip")
 
-        status_code, result = _get_results(self._config, "servers/%s/actions/change_dns_ptr" % self.id, method="POST",
-                                           body={"ip": ip, "dns_ptr": dns_pointer})
+        status_code, result = _get_results(
+            self._config, "servers/%s/actions/change_dns_ptr" % self.id, method="POST",
+            body={"ip": ip, "dns_ptr": dns_pointer}
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 
@@ -130,8 +137,10 @@ class HetznerCloudServer(object):
         if not new_instance_type:
             raise HetznerInvalidArgumentException("new_instance_type")
 
-        status_code, result = _get_results(self._config, "servers/%s/actions/change_type" % self.id, method="POST",
-                                           body={"server_type": new_instance_type, "upgrade_disk": upgrade_disk})
+        status_code, result = _get_results(
+            self._config, "servers/%s/actions/change_type" % self.id, method="POST",
+            body={"server_type": new_instance_type, "upgrade_disk": upgrade_disk}
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 
@@ -165,8 +174,10 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def enable_backups(self, backup_window=BACKUP_WINDOW_2AM_6AM):
-        status_code, result = _get_results(self._config, "servers/%s/actions/enable_backup" % self.id, method="POST",
-                                           body={"backup_window": backup_window})
+        status_code, result = _get_results(
+            self._config, "servers/%s/actions/enable_backup" % self.id, method="POST",
+            body={"backup_window": backup_window}
+        )
         if status_code != 201:
             raise HetznerActionException("Invalid backup window choice" if status_code == 422 else result)
 
@@ -174,7 +185,7 @@ class HetznerCloudServer(object):
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
-    def enable_rescue_mode(self, rescue_type=RESCUE_TYPE_LINUX, ssh_keys=[]):
+    def enable_rescue_mode(self, rescue_type=RESCUE_TYPE_LINUX, ssh_keys=None):
         """
         Enables rescue mode for the current server.
 
@@ -190,12 +201,16 @@ class HetznerCloudServer(object):
         :return: A tuple containing the root SSH password to access the recovery mode and the action to track the
                  progress of the request.
         """
+        if ssh_keys is None:
+            ssh_keys = []
         body = {"type": rescue_type}
         if ssh_keys and len(ssh_keys > 0) and rescue_type != RESCUE_TYPE_FREEBSD:
             body["ssh_keys"] = ssh_keys
 
-        status_code, result = _get_results(self._config, "servers/%s/actions/enable_rescue" % self.id, method="POST",
-                                           body=body)
+        status_code, result = _get_results(
+            self._config, "servers/%s/actions/enable_rescue" % self.id, method="POST",
+            body=body
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 
@@ -208,8 +223,10 @@ class HetznerCloudServer(object):
         if description is not None:
             body["description"] = description
 
-        status_code, result = _get_results(self._config, "servers/%s/actions/create_image" % self.id, method="POST",
-                                           body=body)
+        status_code, result = _get_results(
+            self._config, "servers/%s/actions/create_image" % self.id, method="POST",
+            body=body
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 
@@ -244,8 +261,10 @@ class HetznerCloudServer(object):
         if not image:
             raise HetznerInvalidArgumentException("image")
 
-        status_code, result = _get_results(self._config, "servers/%s/actions/rebuild" % self.id, method="POST",
-                                           body={"image": image})
+        status_code, result = _get_results(
+            self._config, "servers/%s/actions/rebuild" % self.id, method="POST",
+            body={"image": image}
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 

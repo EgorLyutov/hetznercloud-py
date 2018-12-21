@@ -1,5 +1,5 @@
-from .exceptions import HetznerActionException
-from .shared import _get_results
+from hetznercloud.exceptions import HetznerActionException
+from hetznercloud.shared import _get_results
 
 
 class HetznerCloudLocationsAction(object):
@@ -7,8 +7,10 @@ class HetznerCloudLocationsAction(object):
         self._config = config
 
     def get_all(self, name=None):
-        status_code, results = _get_results(self._config, "locations",
-                                            url_params={"name": name} if name is not None else None)
+        status_code, results = _get_results(
+            self._config, "locations",
+            url_params={"name": name} if name is not None else None
+        )
         if status_code != 200:
             raise HetznerActionException(results)
 
@@ -36,7 +38,6 @@ class HetznerCloudLocation(object):
     @staticmethod
     def _load_from_json(json):
         location = HetznerCloudLocation()
-
         location.id = int(json["id"])
         location.name = json["name"]
         location.description = json["description"]
@@ -44,5 +45,4 @@ class HetznerCloudLocation(object):
         location.city = json["city"]
         location.latitude = float(json["latitude"])
         location.longitude = float(json["longitude"])
-
         return location

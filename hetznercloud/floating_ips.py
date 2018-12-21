@@ -1,6 +1,6 @@
 from hetznercloud.actions import HetznerCloudAction
-from .exceptions import HetznerInvalidArgumentException, HetznerActionException
-from .shared import _get_results
+from hetznercloud.exceptions import HetznerInvalidArgumentException, HetznerActionException
+from hetznercloud.shared import _get_results
 
 
 class HetznerCloudFloatingIpAction(object):
@@ -58,8 +58,10 @@ class HetznerCloudFloatingIp(object):
         if not server_id:
             raise HetznerInvalidArgumentException("server_id")
 
-        status_code, result = _get_results(self._config, "floating_ips/%s/actions/assign" % self.id, method="POST",
-                                           body={"server": server_id})
+        status_code, result = _get_results(
+            self._config, "floating_ips/%s/actions/assign" % self.id, method="POST",
+            body={"server": server_id}
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 
@@ -68,8 +70,10 @@ class HetznerCloudFloatingIp(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def change_description(self, new_description):
-        status_code, result = _get_results(self._config, "floating_ips/%s" % self.id, method="PUT",
-                                           body={"description": new_description})
+        status_code, result = _get_results(
+            self._config, "floating_ips/%s" % self.id, method="PUT",
+            body={"description": new_description}
+        )
         if status_code != 200:
             raise HetznerActionException(result)
 
@@ -79,8 +83,10 @@ class HetznerCloudFloatingIp(object):
         if not ip:
             raise HetznerInvalidArgumentException("ip")
 
-        status_code, result = _get_results(self._config, "floating_ips/%s/actions/change_dns_ptr" % self.id,
-                                           method="POST", body={"ip": ip, "dns_ptr": dns_ptr})
+        status_code, result = _get_results(
+            self._config, "floating_ips/%s/actions/change_dns_ptr" % self.id,
+            method="POST", body={"ip": ip, "dns_ptr": dns_ptr}
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 

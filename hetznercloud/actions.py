@@ -1,16 +1,18 @@
 import time
 
-from .constants import ACTION_STATUS_ERROR
-from .exceptions import HetznerWaitAttemptsExceededException, HetznerInternalServerErrorException
-from .shared import _get_results
+from hetznercloud.constants import ACTION_STATUS_ERROR
+from hetznercloud.exceptions import HetznerWaitAttemptsExceededException, HetznerInternalServerErrorException
+from hetznercloud.shared import _get_results
 
 
 def _get_action_json(config, id):
     status_code, json = _get_results(config, "actions/%s" % id)
     return json["action"]
 
+
 class HetznerCloudActionsAction(object):
     pass
+
 
 class HetznerCloudAction(object):
     """
@@ -19,6 +21,7 @@ class HetznerCloudAction(object):
 
     Instead, the cloud API returns an 'action', which can be used to check up on the status of specific tasks.
     """
+
     def __init__(self, config):
         self.config = config
         self.id = 0
@@ -27,7 +30,7 @@ class HetznerCloudAction(object):
         self.progress = 0
         self.started = ""
         self.finished = ""
-        self.error = { "code": "", "message": "" }
+        self.error = {"code": "", "message": ""}
 
     def wait_until_status_is(self, status, attempts=20, wait_seconds=1):
         """

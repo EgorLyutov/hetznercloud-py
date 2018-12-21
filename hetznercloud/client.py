@@ -1,12 +1,13 @@
-from .floating_ips import HetznerCloudFloatingIpAction
-from .ssh_keys import HetznerCloudSSHKeysAction
-from .images import HetznerCloudImagesAction
-from .datacenters import HetznerCloudDatacentersAction
-from .exceptions import HetznerConfigurationException
-from .isos import HetznerCloudIsosAction
-from .locations import HetznerCloudLocationsAction
-from .server_types import HetznerCloudServerTypesAction
-from .servers import HetznerCloudServersAction
+from hetznercloud.floating_ips import HetznerCloudFloatingIpAction
+from hetznercloud.ssh_keys import HetznerCloudSSHKeysAction
+from hetznercloud.images import HetznerCloudImagesAction
+from hetznercloud.datacenters import HetznerCloudDatacentersAction
+from hetznercloud.exceptions import HetznerConfigurationException
+from hetznercloud.isos import HetznerCloudIsosAction
+from hetznercloud.locations import HetznerCloudLocationsAction
+from hetznercloud.server_types import HetznerCloudServerTypesAction
+from hetznercloud.servers import HetznerCloudServersAction
+from hetznercloud.volumes import HetznerCloudVolumeAction
 
 
 class HetznerCloudClientConfiguration(object):
@@ -71,3 +72,6 @@ class HetznerCloudClient(object):
 
     def ssh_keys(self):
         return HetznerCloudSSHKeysAction(self.configuration)
+
+    def volumes(self):
+        return HetznerCloudVolumeAction(self.configuration)

@@ -1,6 +1,5 @@
-from .constants import IMAGE_TYPE_SNAPSHOT
-from .exceptions import HetznerActionException
-from .shared import _get_results
+from hetznercloud.exceptions import HetznerActionException
+from hetznercloud.shared import _get_results
 
 
 class HetznerCloudImagesAction(object):

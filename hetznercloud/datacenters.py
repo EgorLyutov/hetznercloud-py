@@ -1,6 +1,6 @@
-from .exceptions import HetznerActionException
-from .locations import HetznerCloudLocation
-from .shared import _get_results
+from hetznercloud.exceptions import HetznerActionException
+from hetznercloud.locations import HetznerCloudLocation
+from hetznercloud.shared import _get_results
 
 
 class HetznerCloudDatacentersAction(object):

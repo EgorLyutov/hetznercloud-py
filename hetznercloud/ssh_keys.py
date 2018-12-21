@@ -1,5 +1,5 @@
-from .exceptions import HetznerInvalidArgumentException, HetznerActionException
-from .shared import _get_results
+from hetznercloud.exceptions import HetznerInvalidArgumentException, HetznerActionException
+from hetznercloud.shared import _get_results
 
 
 class HetznerCloudSSHKeysAction(object):
@@ -7,8 +7,10 @@ class HetznerCloudSSHKeysAction(object):
         self._config = config
 
     def get_all(self, name=None):
-        status_code, results = _get_results(self._config, "ssh_keys",
-                                            url_params={"name": name} if name is not None else None)
+        status_code, results = _get_results(
+            self._config, "ssh_keys",
+            url_params={"name": name} if name is not None else None
+        )
         if status_code != 200:
             raise HetznerActionException(results)
 
@@ -28,8 +30,10 @@ class HetznerCloudSSHKeysAction(object):
         if not public_key:
             raise HetznerInvalidArgumentException("public_key")
 
-        status_code, result = _get_results(self._config, "ssh_keys", method="POST",
-                                           body={"name": name, "public_key": public_key})
+        status_code, result = _get_results(
+            self._config, "ssh_keys", method="POST",
+            body={"name": name, "public_key": public_key}
+        )
         if status_code != 201:
             raise HetznerActionException(result)
 
@@ -53,8 +57,10 @@ class HetznerCloudSSHKey(object):
         if not name:
             raise HetznerInvalidArgumentException("name")
 
-        status_code, result = _get_results(self._config, "ssh_keys/%s" % self.id, method="PUT",
-                                           body={"name": name})
+        status_code, result = _get_results(
+            self._config, "ssh_keys/%s" % self.id, method="PUT",
+            body={"name": name}
+        )
         if status_code != 200:
             raise HetznerActionException(result)
 
